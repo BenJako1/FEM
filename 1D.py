@@ -3,8 +3,9 @@ import matplotlib.pyplot as plt
 
 class Bar:
     def __init__(self, k, A):
-        self.nodes = None
+        self.x = None
         self.N = None
+        self.nodes = None
         self.elements = None
 
         self.k = k
@@ -12,7 +13,8 @@ class Bar:
     
     def geometry(self, L=1, N=5, verbose=False):
         self.N = N
-        self.nodes = np.linspace(0, L, N)
+        self.nodes = np.array(list(range(N)))
+        self.x = np.linspace(0, L, N)
 
         self.elements = np.zeros([N-1, 2])
         for i in range(len(self.elements)):
@@ -20,7 +22,7 @@ class Bar:
             self.elements[i, 1] = i+1
 
         if verbose:
-            print(f'Nodes at: x={self.nodes}')
+            print(f'Nodes at: x={self.x}')
             print(f'Elements with nodes: \n {self.elements}')
 
     def assemble_conductance(self, verbose=False):
@@ -28,7 +30,7 @@ class Bar:
                                        [-1, 1]])
         self.Conductance = np.zeros([self.N, self.N])
         for i in range(self.N-1):
-            coefficient = self.k * self.A / (self.nodes[i+1] - self.nodes[i])
+            coefficient = self.k * self.A / (self.x[i+1] - self.x[i])
             self.Conductance[i, i] += element_conductance[0, 0] * coefficient
             self.Conductance[i, i+1] += element_conductance[0, 1] * coefficient
             self.Conductance[i+1, i] += element_conductance[1, 0] * coefficient
@@ -38,6 +40,9 @@ class Bar:
             print(f'Conductivity matrix: \n {self.Conductance}')
     
     def bound(self, boundDict, verbose=False):
+        if len(set([len(boundDict["nodes"]), len(boundDict["type"]), len(boundDict["value"])])) != 1:
+            raise ValueError("Boundary entries must have the same length")
+
         nodes_unpacked = []
         types_unpacked = []
         values_unpacked = []
@@ -58,35 +63,32 @@ class Bar:
                 types_unpacked.append(type)
                 values_unpacked.append(value)
 
-        if len(nodes_unpacked) == len(types_unpacked) == len(values_unpacked):
-            self.T = np.full(shape=[self.N], fill_value=None, dtype=object)
-            self.Q = np.full(shape=[self.N], fill_value=0, dtype=object)
-            self.boundNodes = []
+        self.T = np.full(shape=[self.N], fill_value=None, dtype=object)
+        self.Q = np.full(shape=[self.N], fill_value=0, dtype=object)
+        self.boundNodes = []
 
-            for i in range(len(nodes_unpacked)):
-                if types_unpacked[i] == "temp":
-                    self.T[nodes_unpacked[i]] = values_unpacked[i]
+        for i in range(len(nodes_unpacked)):
+            if types_unpacked[i] == "temp":
+                self.T[nodes_unpacked[i]] = values_unpacked[i]
+                if self.Q[nodes_unpacked[i]] == 0:
                     self.Q[nodes_unpacked[i]] = None
-                    self.boundNodes.append(nodes_unpacked[i])
-                elif types_unpacked[i] == "flux":
-                    self.Q[nodes_unpacked[i]] += values_unpacked[i]
-                elif types_unpacked[i] == "gen":
-                    if nodes_unpacked[i] <= max(nodes_unpacked):
-                        if self.Q[nodes_unpacked[i]] == None:
-                            self.Q[nodes_unpacked[i]] = self.A * values_unpacked[i] * \
-                                                            (self.nodes[nodes_unpacked[i]+1] - self.nodes[nodes_unpacked[i]]) / 2
-                        else:
-                            self.Q[nodes_unpacked[i]] += self.A * values_unpacked[i] * \
-                                                            (self.nodes[nodes_unpacked[i]+1] - self.nodes[nodes_unpacked[i]]) / 2
-                        if self.Q[nodes_unpacked[i]+1] == None:
-                            self.Q[nodes_unpacked[i]+1] = self.A * values_unpacked[i] * \
-                                                            (self.nodes[nodes_unpacked[i]+1] - self.nodes[nodes_unpacked[i]]) / 2
-                        else:
-                            self.Q[nodes_unpacked[i]+1] += self.A * values_unpacked[i] * \
-                                                        (self.nodes[nodes_unpacked[i]+1] - self.nodes[nodes_unpacked[i]]) / 2
-        else:
-            raise ValueError("Boundary entries must have the same length")
-
+                self.boundNodes.append(nodes_unpacked[i])
+            elif types_unpacked[i] == "flux":
+                self.Q[nodes_unpacked[i]] += values_unpacked[i]
+            elif types_unpacked[i] == "gen":
+                if self.Q[nodes_unpacked[i]] == None:
+                    self.Q[nodes_unpacked[i]] = self.A * values_unpacked[i] * \
+                                                    (self.x[nodes_unpacked[i]+1] - self.x[nodes_unpacked[i]]) / 2
+                else:
+                    self.Q[nodes_unpacked[i]] += self.A * values_unpacked[i] * \
+                                                    (self.x[nodes_unpacked[i]+1] - self.x[nodes_unpacked[i]]) / 2
+                if self.Q[nodes_unpacked[i]+1] == None:
+                    self.Q[nodes_unpacked[i]+1] = self.A * values_unpacked[i] * \
+                                                    (self.x[nodes_unpacked[i]+1] - self.x[nodes_unpacked[i]]) / 2
+                else:
+                    self.Q[nodes_unpacked[i]+1] += self.A * values_unpacked[i] * \
+                                                (self.x[nodes_unpacked[i]+1] - self.x[nodes_unpacked[i]]) / 2
+                
         self.freeNodes = [int(i) for i in range(self.N) if i not in self.boundNodes]
 
         if verbose:
@@ -118,24 +120,26 @@ class Bar:
         for i in range(len(self.boundNodes)):
             T_sol[self.boundNodes[i]] = self.T[self.boundNodes[i]]
         
-        return T_sol
+        Q_sol = np.float64(self.Conductance) @ np.float64(T_sol)
+
+        return T_sol, Q_sol
 
 if __name__ == "__main__":
-    sim = Bar(k=0.1, A=1)
-    sim.geometry(L=1, N=100, verbose=False)
+    sim = Bar(k=25, A=1)
+    sim.geometry(L=1, N=5, verbose=False)
     sim.assemble_conductance(verbose=False)
-    boundDict = {"nodes": [0,"0:99",99], "type": ["temp","gen","temp"], "value": [0,10,0]}
-    sim.bound(boundDict, verbose=True)
-    T = sim.solve()
+    boundDict = {"nodes": [0, 4], "type": ["flux", "temp"], "value": [400,0]}
+    sim.bound(boundDict, verbose=False)
+    T, Q = sim.solve()
 
-    print(T)
+    print(T, Q)
 
-    x = sim.nodes
-    plt.plot(x, T)
+    plt.plot(sim.x, T)
+    plt.grid()
     plt.show()
 
 """
 TO DO:
 - Add convection BC
-- Back-calculate unknown Qs
+- Edge case check especially on back calculating Q
 """

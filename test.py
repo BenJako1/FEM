@@ -1,12 +1,8 @@
 import numpy as np
 
-arr = np.array([[  20, -10,   0,   0],
-                [ -10,  20, -10,   0],
-                [   0, -10,  20, -10],
-                [   0,   0, -10,  10]])
+my_list = [5, 5, 5, 6]
 
-vec = np.array([2500, 0, -200, 0])
-
-sol = np.linalg.solve(arr, vec)
-
-print(sol)
+if len(set(my_list)) == 1:
+    print("All elements are equal.")
+else:
+    print("Elements are not equal.")
