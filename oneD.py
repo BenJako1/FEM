@@ -133,16 +133,16 @@ class oneD:
         return T_sol, Q_sol
 
 if __name__ == "__main__":
-    sim = oneD(k=0.1, A=1)
+    sim = oneD(k=0.4, A=1)
     sim.geometry(L=0.4, N=20, verbose=False)
     sim.assemble_conductance(verbose=False)
-    convSurfProp = np.array([20, 0.1, 20])
-    convFaceProp = np.array([2, 20])
-    boundDict = {"nodes": [0,"0:19"], "type": ["temp","convSurf"], "value": [300,convSurfProp]}
+    convFaceProp1 = np.array([2, 20])
+    convFaceProp2 = np.array([2, 20])
+    boundDict = {"nodes": [0,"0:19",19], "type": ["convFace","gen","convFace"], "value": [convFaceProp1,10,convFaceProp2]}
     sim.bound(boundDict, verbose=False)
     T, Q = sim.solve()
-
     plt.plot(sim.x, T)
+
     plt.xlim(0,max(sim.x))
     plt.grid()
     plt.show()
@@ -150,7 +150,5 @@ if __name__ == "__main__":
 """
 TO DO:
 - Add "properties" dict to allow for non-uniform h and k and T_inf
-- Edge case check especially on back calculating Q
 - Implement "None" datatype for visualisation
-- Figure out if the behaviours when convFace input < 0 is legit
 """
