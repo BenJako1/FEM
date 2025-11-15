@@ -4,11 +4,6 @@ import utils
 
 class twoD:
     def __init__(self, k, t):
-        self.x = None
-        self.y = None
-        self.nodes = None
-        self.elements = None
-
         self.k = k
         self.t = t
 
@@ -83,11 +78,17 @@ class twoD:
                     self.T[node_index] = boundaryValues[i]
                     self.boundNodes.append(node_index)
             elif boundaryTypes[i] == "flux":
-                edge_lengths = np.zeros(len(boundary[i])-1)
-                for j in range(len(edge_lengths)):
+                for j in range(len(boundary[i])-1):
                     edge_length = np.sqrt((self.x[boundary[i][j]]-self.x[boundary[i][j+1]])**2+(self.y[boundary[i][j]]-self.y[boundary[i][j+1]])**2)
                     self.Q[boundary[i][j]] += boundaryValues[i] * self.t * edge_length / 2
                     self.Q[boundary[i][j+1]] += boundaryValues[i] * self.t * edge_length / 2
+            elif boundaryTypes[i] == "conv":
+                    for j in range(len(boundary[i])-1):
+                        edge_length = np.sqrt((self.x[boundary[i][j]]-self.x[boundary[i][j+1]])**2+(self.y[boundary[i][j]]-self.y[boundary[i][j+1]])**2)
+                        self.Q[boundary[i][j]] += boundaryValues[i][0] * boundaryValues[i][1] * self.t * edge_length / 2
+                        self.Q[boundary[i][j+1]] += boundaryValues[i][0] * boundaryValues[i][1] * self.t * edge_length / 2
+                        self.Convection[boundary[i][j]] += boundaryValues[i][0] * boundaryValues[i][1] * self.t * edge_length / 2
+                        self.Convection[boundary[i][j+1]] += boundaryValues[i][0] * boundaryValues[i][1] * self.t * edge_length / 2
         for i in range(len(node)):
             if nodeTypes[i] == "temp":
                 self.T[node[i]] = nodeValues[i]
@@ -160,14 +161,12 @@ if __name__ == "__main__":
     bottom = np.array([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
     left = np.array([0, 21, 42, 63, 84, 105, 126, 147, 168, 189, 210])
     right = np.array([20, 41, 62, 83, 104, 125, 146, 167, 188, 209, 230])
+    convParameters = np.array([1, 20])
     elementDict = {"element": ["0:400"], "type": ["gen"], "value": [1]}
-    boundaryDict = {"boundary": [left, right], "type": ["temp", "temp"], "value": [100, 100]}
+    boundaryDict = {"boundary": [left, right], "type": ["conv", "conv"], "value": [convParameters, convParameters]}
     nodeDict = {"node": [], "type": [], "value": []}    
     sim.bound(nodeDict, boundaryDict, elementDict, verbose=True)
     T, Q = sim.solve()
-
-    plt.plot(sim.x[-11:], T[-11:])
-    plt.plot(sim.x[:11], T[:11])
 
     fig = plt.figure()
     ax = fig.add_subplot(111, projection='3d')
@@ -177,12 +176,7 @@ if __name__ == "__main__":
 
 """
 TO DO:
-- Build convection matrix and add to calcMat instead of index operations
-- Make meshing available for non-integer value coordinates
-- Decide which A calculation to keep
-- Find and fix error where nodes on the 'top' boundary have spurious values
-    - Not dependent on 'gen' BC although flux seems wrong for gen
-    - Still appears with correct flux (0) when bottom/top flux BC
-    - freeNodes and boundNodes are correct
-    - Convection is correct
+- Add convection
+    - Maybe: build convection matrix and add to calcMat instead of index operations
+- decide on edge_length handling in boundary 
 """
