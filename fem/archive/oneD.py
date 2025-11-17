@@ -24,7 +24,7 @@ class oneD:
             self.elements[i, 0] = i
             self.elements[i, 1] = i+1
 
-        # Calculate element lenghts
+        # Calculate element lengths
         self.element_len = np.zeros([N-1])
         for i in range(self.N-1):
             self.element_len[i] = ((self.x[i+1] - self.x[i]))
