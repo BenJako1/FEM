@@ -48,44 +48,10 @@ def unpack_dict(input_dict, ):
 
     return unpacked
 
-import numpy as np
-
-def mesh_tri(L, H, n_x, n_y):
-
-    # --- Generate nodes (row-major) ---
-    nodes = np.zeros((n_x*n_y, 2))
-    for j in range(n_y):
-        for i in range(n_x):
-            idx = j*n_x + i
-            nodes[idx, 0] = L * i / (n_x - 1)
-            nodes[idx, 1] = H * j / (n_y - 1)
-
-    # --- Generate triangular elements ---
-    # 2 triangles per quad
-    elements = np.zeros(((n_x - 1)*(n_y - 1)*2, 3), dtype=int)
-
-    k = 0
-    for j in range(n_y - 1):
-        for i in range(n_x - 1):
-
-            # local quad nodes
-            A = j*n_x + i
-            B = A + 1
-            D = A + n_x
-            C = D + 1     # (j+1)*n_x + (i+1)
-
-            # Pattern 2 (upper-left → lower-right diagonal)
-            # tri1 = (A, B, C)
-            # tri2 = (A, C, D)
-
-            elements[k, :] = [A, B, C]
-            k += 1
-
-            elements[k, :] = [A, C, D]
-            k += 1
-
-    return nodes, np.int16(elements)
+def edge_length(node1, node2):
+    x1, y1 = node1
+    x2, y2 = node2
+    return np.sqrt((x2-x1)**2 + (y2-y1)**2)
 
 if __name__ == "__main__":
-    nodes, elements = mesh_tri(L=10, H=4, n_x=11, n_y=5)
-    print(nodes)
+    pass

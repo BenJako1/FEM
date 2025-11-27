@@ -1,35 +1,43 @@
 import numpy as np
 from fem.common.utils import unpack_dict
 
-def bound(sim, boundDict):
-    bd = unpack_dict(boundDict)
+def bound(sim, elementDict, nodeDict):
+    sim.T = np.zeros(sim.mesh.N)
+    sim.Q = np.zeros(sim.mesh.N)
+    sim.boundNodes = []
 
-    for node, typ, value in zip(bd["nodes"], bd["type"], bd["value"]):
-        if typ == "temp":
-            sim.T[node] = value
-            sim.boundNodes.append(node)
+    sim.convNodes = []
+    sim.convElems = []
 
-        elif typ == "flux":
-            sim.Q[node] += value
+    ed = unpack_dict(elementDict)
+    nd = unpack_dict(nodeDict)
 
-        elif typ == "gen":
-            Qv = sim.A * value * sim.mesh.element_len[node]
-            sim.Q[node] += Qv / 2
-            sim.Q[node + 1] += Qv / 2
-
-        elif typ == "convFace":
-            h, Tinf = value
-            sim.Q[node] += h * Tinf * sim.A
-            sim.Convection[node] += h * sim.A
+    for element, typ, value in zip(ed["element"], ed["type"], ed["value"]):
+        if typ == "gen":
+            n1, n2 = sim.elements[element]
+            Qv = sim.A * value * sim.mesh.element_len[element]
+            sim.Q[n1] += Qv / 2
+            sim.Q[n2] += Qv / 2
 
         elif typ == "convSurf":
             h, Wc, Tinf = value
-            area = Wc * sim.mesh.element_len[node]
-
-            sim.Q[node] += h * area * Tinf / 2
-            sim.Q[node+1] += h * area * Tinf / 2
-
-            sim.Convection[node] += h * area / 2
-            sim.Convection[node+1] += h * area / 2
-
-    sim.freeNodes = [i for i in range(sim.N) if i not in sim.boundNodes]
+            L = sim.mesh.element_len[element]
+            area = Wc * L
+            sim.convElems.append((element, h, Tinf, area))
+    
+    for node, typ, value in zip(nd["node"], nd["type"], nd["value"]):
+        if typ == "temp":
+            sim.T[node] = value
+            sim.boundNodes.append(node)
+        
+        elif typ == "flux":
+            sim.Q[node] += value
+        
+        elif typ == "convFace":
+            h, Tinf = value
+            area = sim.A
+            sim.convNodes.append((node, h, Tinf, area))
+    
+    sim.freeNodes = [i for i in range(sim.mesh.N) if i not in sim.boundNodes]
+    sim.convNodes = {entry[0]: (entry[1], entry[2], entry[3]) for entry in sim.convNodes}
+    sim.convElems = {entry[0]: (entry[1], entry[2], entry[3]) for entry in sim.convElems}

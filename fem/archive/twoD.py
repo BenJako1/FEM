@@ -163,7 +163,7 @@ if __name__ == "__main__":
     bottom = np.int16(np.linspace(0, 20, 21))
     convParameters = np.array([0.1, 20])
     elementDict = {"element": [f"0:{len(sim.elements)}"], "type": ["gen"], "value": [10]}
-    boundaryDict = {"boundary": [left, top, right, bottom], "type": ["temp", "temp", "temp", "temp"], "value": [10, 10, 10, 10]}
+    boundaryDict = {"boundary": [left, top, right, bottom], "type": ["conv", "temp", "conv", "temp"], "value": [convParameters, 10, convParameters, 10]}
     nodeDict = {"node": [], "type": [], "value": []}    
     sim.bound(nodeDict, boundaryDict, elementDict, verbose=True)
     T, Q = sim.solve()

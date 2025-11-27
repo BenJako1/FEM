@@ -1,6 +1,37 @@
+import numpy as np
+
 class SolverBase:
     def apply_boundary_conditions(self, *args, **kwargs):
         raise NotImplementedError
 
     def solve(self):
-        raise NotImplementedError
+        K = np.copy(self.Ksol)
+        Q = np.copy(self.Q)
+
+        # remove rows
+        for count, bn in enumerate(self.boundNodes):
+            K = np.delete(K, bn - count, axis=0)
+            Q = np.delete(Q, bn - count, axis=0)
+
+        # subtract known boundary temperatures
+        for bn in self.boundNodes:
+            Q -= K[:, bn] * self.T[bn]
+
+        # remove columns
+        for count, bn in enumerate(self.boundNodes):
+            K = np.delete(K, bn - count, axis=1)
+
+        T_unknown = np.linalg.solve(K, Q)
+
+        Tsol = np.zeros(self.mesh.N)
+        for i, fn in enumerate(self.freeNodes):
+            Tsol[fn] = T_unknown[i]
+        for bn in self.boundNodes:
+            Tsol[bn] = self.T[bn]
+
+        Qsol = self.K @ Tsol
+
+        if round(np.sum(Qsol), 5) != 0:
+            raise ValueError("Flux is non-conservative!")
+    
+        return Tsol, Qsol
