@@ -5,7 +5,6 @@ import numpy as np
 sim = HeatSolver2D(k=0.2, t=1.25)
 
 sim.mesh = TriMesh2D(120, 160, 100, 10)
-
 wall = [[0, 3]]
 
 free = [[2, 5]]

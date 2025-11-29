@@ -26,7 +26,7 @@ def bound(sim, elementDict, edgeDict, nodeDict):
     for edge, type, value in zip(bd["edge"], bd["type"], bd["value"]):
         if type == "conv":
             h, T_inf = value
-            length = edge_length(sim.mesh.nodes[edge[0]], sim.mesh.nodes[edge[1]])
+            length = edge_length((sim.mesh.x[edge[0]], sim.mesh.y[edge[0]]), (sim.mesh.x[edge[1]], sim.mesh.y[edge[1]]))
             A = length * sim.t
             sim.conv_1d.append((edge, h, A, T_inf))
         

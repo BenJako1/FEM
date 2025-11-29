@@ -6,7 +6,6 @@ class LineMesh1D:
         self.N = N
 
         # Generate nodal indices and x-coordinates lists
-        self.nodes = np.arange(N)
         self.x = np.linspace(0, L, N)
 
         # Generate element node lists
