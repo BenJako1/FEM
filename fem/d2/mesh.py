@@ -6,6 +6,8 @@ class TriMesh2D:
 
         self.x = np.zeros(self.N)
         self.y = np.zeros(self.N)
+        self.z = np.zeros(self.N)
+
         for j in range(ny):
             for i in range(nx):
                 idx = j*nx + i
@@ -13,6 +15,8 @@ class TriMesh2D:
                 y = H * j / (ny - 1)
                 self.x[idx] = x
                 self.y[idx] = y
+
+        self.nodes = np.vstack((self.x, self.y, self.z)).T
 
         # Generate elements from quads
         self.elements = np.zeros(((nx - 1)*(ny - 1)*2, 3), dtype=int)

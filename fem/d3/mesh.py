@@ -3,8 +3,7 @@ import numpy as np
 class TetMesh3D:
     def __init__(self, L, W, H, nx, ny, nz):
         self.N = nx*ny*nz
-        # Generate nodes
-        self.nodes = np.zeros((self.N, 2))
+
         self.x = np.zeros(self.N)
         self.y = np.zeros(self.N)
         self.z = np.zeros(self.N)
@@ -15,13 +14,12 @@ class TetMesh3D:
                     x = L * i / (nx - 1)
                     y = H * j / (ny - 1)
                     z = W * k / (nz - 1)
-                    self.nodes[idx] = [x, y, z]
                     self.x[idx] = x
                     self.y[idx] = y
                     self.z[idx] = z
 
         # Generate elements from quads
-        self.elements = np.zeros(((nx - 1)*(ny - 1)*(nz - 1)*4, 4), dtype=int)
+        self.elements = np.zeros(((nx - 1)*(ny - 1)*(nz - 1)*5, 4), dtype=int)
 
         count = 0
         for k in range(nz - 1):
@@ -49,9 +47,24 @@ class TetMesh3D:
                     self.elements[count, :] = [B, D, E, G]
                     count += 1
         
-        tets = self.nodes[self.elements]
-        x1, y1, z1 = tets[:,0,0], tets[:,0,1]
-        x2, y2, z2 = tets[:,1,0], tets[:,1,1]
-        x3, y3, z3 = tets[:,2,0], tets[:,2,1]
+        # Extract node coordinates for each tet
+        x = self.x[self.elements]
+        y = self.y[self.elements]
+        z = self.z[self.elements]
 
-        self.V = 0.5 * np.abs(x1*(y2 - y3) + x2*(y3 - y1) + x3*(y1 - y2))
+        # Build edge vectors v2-v1, v3-v1, v4-v1 for all elements
+        v21 = np.column_stack((x[:,1] - x[:,0],
+                            y[:,1] - y[:,0],
+                            z[:,1] - z[:,0]))
+
+        v31 = np.column_stack((x[:,2] - x[:,0],
+                            y[:,2] - y[:,0],
+                            z[:,2] - z[:,0]))
+
+        v41 = np.column_stack((x[:,3] - x[:,0],
+                            y[:,3] - y[:,0],
+                            z[:,3] - z[:,0]))
+
+        # Stack into a batch of 3×3 matrices: shape (Ne, 3, 3)
+        M = np.stack((v21, v31, v41), axis=1)
+        self.V = np.abs(np.linalg.det(M)) / 6.0

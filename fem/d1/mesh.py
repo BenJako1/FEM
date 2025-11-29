@@ -7,6 +7,10 @@ class LineMesh1D:
 
         # Generate nodal indices and x-coordinates lists
         self.x = np.linspace(0, L, N)
+        self.y = np.zeros(N)
+        self.z = np.zeros(N)
+
+        self.nodes = np.vstack((self.x, self.y, self.z)).T
 
         # Generate element node lists
         self.elements = np.zeros([N-1, 2], dtype=int)

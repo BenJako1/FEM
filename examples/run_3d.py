@@ -1,15 +1,8 @@
-import pygmsh
+from fem.d3.solver import HeatSolver3D
+from fem.d3.mesh import TetMesh3D
 
-with pygmsh.geo.Geometry() as geom:
-    poly = geom.add_polygon(
-        [
-            [0.0, 0.0],
-            [1.0, -0.2],
-            [1.1, 1.2],
-            [0.1, 0.7],
-        ],
-        mesh_size=0.1,
-    )
-    geom.extrude(poly, [0.0, 0.3, 1.0], num_layers=5)
-    mesh = geom.generate_mesh()
+sim = HeatSolver3D(k=1)
+sim.mesh = TetMesh3D(5, 3, 2, 6, 4, 3)
 
+print(sim.mesh.elements)
+print(sim.mesh.V)

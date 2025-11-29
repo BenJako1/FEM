@@ -1,27 +1,21 @@
 import numpy as np
 from fem.common.solver_base import SolverBase
-from .assembly import assemble_2d, assemble_nonphys_1d, assemble_nonphys_2d
-from .boundary import bound
+from fem.common.boundary import Boundary
+from .assembly import assemble_2d
 
 class HeatSolver2D(SolverBase):
-    def __init__(self, k, t):
+    def __init__(self, mesh, k, t):
         self.k = k
         self.t = t
-
-    def apply_boundary_conditions(self, elementDict, edgeDict, nodeDict):
-        bound(self, elementDict, edgeDict, nodeDict)
+        self.mesh = mesh
+        self.boundary = Boundary(self)
 
     def assemble(self):
-        self.K, self.Q = assemble_2d(self.mesh, self.k, self.t, self.F)
+        self.K, self.Q = assemble_2d(self.mesh, self.k, self.t)
+        self.T = np.zeros(self.mesh.N)
 
         self.K_sol = np.copy(self.K)
         self.Q_sol = np.copy(self.Q)
-        assemble_nonphys_1d(self.K_sol,
-                            self.Q_sol,
-                            convBC=self.conv_1d)
-        assemble_nonphys_2d(self.K_sol,
-                            self.Q_sol,
-                            convBC=self.conv_2d)
 
     def solve(self):
         return SolverBase.solve(self)
