@@ -17,6 +17,8 @@ class TetMesh3D:
         mesh : object
         """
 
+        self.type = "3D"
+
         self.N = nx*ny*nz
 
         self.x = np.zeros(self.N)

@@ -1,17 +1,16 @@
 import numpy as np
 
-def elemental_conductance(k, A, Le):
-    return k * A / Le * np.array([[1, -1], [-1, 1]])
+def element_B_matrix(x, y, z):
+    return None
 
-def convection_stiffness_0d(h, A):
-    return h * A
+def get_element_geometry(sim, e):
+    return {
+            "A": sim.A,
+            "L": sim.mesh.L[e]
+            }
 
-def convection_load_0d(h, A, Tinf):
-    return h * Tinf * A 
-
-def convection_stiffness_1d(h, A):
-    return h * A / 6 * np.array([[2, 1],
-                                  [1, 2]])
-
-def convection_load_1d(h, A, Tinf):
-    return h * Tinf * A / 2 * np.array([1, 1])
+def elemental_conductance(B, k, geom):
+    A = geom["A"]
+    L = geom["L"]
+    return k * A / L * np.array([[1, -1],
+                                 [-1, 1]])

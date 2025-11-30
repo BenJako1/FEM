@@ -1,7 +1,9 @@
 import numpy as np
 
 class TriMesh2D:
-    def __init__(self, L, H, nx, ny):
+    def __init__(self, Lx, Ly, nx, ny):
+        self.type = "2D"
+
         self.N = nx*ny
 
         self.x = np.zeros(self.N)
@@ -11,8 +13,8 @@ class TriMesh2D:
         for j in range(ny):
             for i in range(nx):
                 idx = j*nx + i
-                x = L * i / (nx - 1)
-                y = H * j / (ny - 1)
+                x = Lx * i / (nx - 1)
+                y = Ly * j / (ny - 1)
                 self.x[idx] = x
                 self.y[idx] = y
 

@@ -17,5 +17,11 @@ def element_B_matrix(x, y, z):
     # This already gives the B matrix
     return grads
 
-def elemental_conductance(k, V, B):
+def get_element_geometry(sim, e):
+    return {
+            "V": sim.mesh.V[e]
+           }
+
+def elemental_conductance(B, k, geom):
+    V = geom["V"]
     return k * V * (B.T @ B)
