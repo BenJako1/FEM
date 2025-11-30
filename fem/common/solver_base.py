@@ -8,6 +8,7 @@ class SolverBase:
         K = np.copy(self.K_sol)
         Q = np.copy(self.Q_sol)
 
+        self.boundNodes = np.sort(np.unique(self.boundNodes))
         self.freeNodes = np.array([int(i) for i in range(self.mesh.N) if i not in self.boundNodes])
 
         # remove rows
