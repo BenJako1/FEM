@@ -27,7 +27,7 @@ Finally, the matrices can be solved using ```HeatSolver.solve()``` and the outpu
 
 ### Example: 1D Cooling Fin
 
-```
+```python3
 from fem.solver import HeatSolver
 from mesh.LineMesh1D import LineMesh1D
 
