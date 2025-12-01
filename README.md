@@ -6,5 +6,7 @@ meshes, and line elements, and includes visualisation utilities.
 
 ## Install
 
-```bash
-pip install git+https://github.com/<yourname>/HeatFEM.git
+'''bash
+pip install git+https://github.com/BenJako1/HeatFEM.git
+'''
+
