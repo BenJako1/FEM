@@ -17,6 +17,8 @@ class TetMesh3D:
         mesh : object
         """
 
+        self.type = "3D"
+
         self.N = nx*ny*nz
 
         self.x = np.zeros(self.N)
@@ -114,8 +116,6 @@ class TetMesh3D:
             [0, 2, 3],
             [1, 2, 3]
         ])
-
-        Ne = self.elements.shape[0]
 
         # Expand element nodes to faces
         # shape (Ne, 4 faces, 3 nodes per face)

@@ -2,6 +2,8 @@ import numpy as np
 
 class LineMesh1D:
     def __init__(self, L, N):
+        self.type = "1D"
+
         self.L = L
         self.N = N
 
@@ -18,4 +20,4 @@ class LineMesh1D:
             self.elements[i] = [i, i+1]
 
         # Calculate element lengths
-        self.element_len = np.diff(self.x)
+        self.L = np.diff(self.x)
