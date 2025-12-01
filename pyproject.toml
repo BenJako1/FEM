@@ -1,0 +1,32 @@
+[project]
+name = "HeatFEM"
+version = "0.0.1"
+authors = [
+  { name="Benjamin Jakobs"},
+]
+description = "Finite element heat transfer solver"
+readme = "README.md"
+requires-python = ">=3.9"
+
+dependencies = [
+    "numpy",
+    "scipy",
+    "pygmsh",
+    "meshio",
+    "matplotlib",
+    "pyvista"
+]
+
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Operating System :: OS Independent",
+]
+license = "MIT"
+license-files = ["LICEN[CS]E*"]
+
+[project.urls]
+Homepage = "https://github.com/BenJako1/HeatFEM"
+Issues = "https://github.com/BenJako1/HeatFEM/issues"
+
+[tool.setuptools]
+packages = ["fem", "mesh", "postprocess"]

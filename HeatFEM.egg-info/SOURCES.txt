@@ -1,8 +1,10 @@
 LICENSE
-setup.py
+README.md
+pyproject.toml
 HeatFEM.egg-info/PKG-INFO
 HeatFEM.egg-info/SOURCES.txt
 HeatFEM.egg-info/dependency_links.txt
+HeatFEM.egg-info/requires.txt
 HeatFEM.egg-info/top_level.txt
 fem/__init__.py
 fem/assemble.py

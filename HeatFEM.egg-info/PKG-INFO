@@ -1,5 +1,31 @@
 Metadata-Version: 2.4
 Name: HeatFEM
-Version: 0.1
+Version: 0.0.1
+Summary: Finite element heat transfer solver
+Author: Benjamin Jakobs
+License-Expression: MIT
+Project-URL: Homepage, https://github.com/BenJako1/HeatFEM
+Project-URL: Issues, https://github.com/BenJako1/HeatFEM/issues
+Classifier: Programming Language :: Python :: 3
+Classifier: Operating System :: OS Independent
+Requires-Python: >=3.9
+Description-Content-Type: text/markdown
 License-File: LICENSE
+Requires-Dist: numpy
+Requires-Dist: scipy
+Requires-Dist: pygmsh
+Requires-Dist: meshio
+Requires-Dist: matplotlib
+Requires-Dist: pyvista
 Dynamic: license-file
+
+# HeatFEM
+
+HeatFEM is a lightweight finite element framework for solving steady-state heat
+transfer problems in 1D, 2D, and 3D. It supports tetrahedral meshes, triangular
+meshes, and line elements, and includes visualisation utilities.
+
+## Install
+
+```bash
+pip install git+https://github.com/<yourname>/HeatFEM.git
