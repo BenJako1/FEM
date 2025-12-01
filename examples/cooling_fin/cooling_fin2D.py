@@ -14,12 +14,11 @@ sim.assemble()
 
 # Apply boundary conditions
 sim.boundary.apply_temp1d(wall, 330)
-sim.boundary.apply_conv2d(sim.mesh.elements, 2e-4, 30)
+sim.boundary.apply_conv2d(sim.mesh.elements, 2e-4*2, 30)
 sim.boundary.apply_conv1d(free, 2e-4, sim.t, 30)
 
 # Solve
 T, Q = sim.solve()
-
 # Visualise
 from postprocess.plot_temp2D import plot_temp2D
 plot_temp2D(mesh, T)
