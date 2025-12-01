@@ -14,8 +14,10 @@ pip install git+https://github.com/BenJako1/HeatFEM.git
 
 A solver object is created using the HeatSolver class. Element type does not need to be specified as this is an ettribute of the mesh class.
 
-'''
+```
 from fem.solver import HeatSolver
 sim = HeatSolver(mesh, ...)
-'''
+```
+
+
 
