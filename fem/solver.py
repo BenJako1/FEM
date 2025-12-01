@@ -1,7 +1,6 @@
-from fem.common.solver_base import SolverBase
-from fem.boundary import Boundary
+from .common.solver_base import SolverBase
+from .boundary import Boundary
 from .assemble import assemble
-import numpy as np
 
 class HeatSolver(SolverBase):
     def __init__(self, mesh, k, **params):
